@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:paddingBottom="24dp"
+    android:paddingTop="24dp"
+    android:background="@drawable/task_list_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dummy Title Long"
+        android:textSize="32sp"
+        android:textColor="@color/task_title_text_color"/>
+    <View
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_width="160dp"
+        android:layout_height="1px"
+        android:background="@android:color/black"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="11:00 AM"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            android:textColor="@color/black_text"
+            android:gravity="center"/>
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textColor="@color/black_text"
+            android:textStyle="bold"
+            android:text="12:00 PM"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@color/black_secondary_text"
+        android:text="20"
+        android:gravity="center"/>
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@color/black_secondary_text"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="-10"/>
+
+
+</LinearLayout>
+
+
+
+</LinearLayout>

@@ -1,8 +1,19 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="inspireDo" parent="android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/inspireDo.BlueActionBar</item>
+    </style>
+
+    <style name="inspireDo.BlueActionBar" parent="android:style/Widget.ActionBar">
+        <item name="android:background">@drawable/ab_solid</item>
+        <item name="android:titleTextStyle">@style/inspireDo.BlueActionBar.TextStyle</item>
+    </style>
+
+    <style name="inspireDo.BlueActionBar.TextStyle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
 </resources>

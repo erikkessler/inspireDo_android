@@ -35,9 +35,9 @@ public class ScheduleActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        mAdapter = new ArrayAdapter<TaskModel>(this, android.R.layout.simple_list_item_1);
-
         ListView taskList = (ListView) findViewById(R.id.task_listview);
+
+        mAdapter = new TaskListAdapter(this, R.layout.task_row, taskList);
 
         taskList.setAdapter(mAdapter);
 
