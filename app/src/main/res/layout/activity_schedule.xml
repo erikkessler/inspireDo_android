@@ -12,7 +12,7 @@
         android:id="@+id/task_listview" />
 
     <com.inspiredo.inspiredo.FloatingActionButton
-        android:id="@+id/fab_add"
+        android:id="@+id/fab_complete"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_gravity="bottom|right"

@@ -1,6 +1,7 @@
 package com.inspiredo.inspiredo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -30,18 +33,29 @@ public class ScheduleActivity extends Activity {
 
     private ArrayAdapter<TaskModel> mAdapter;
 
+    private ListView mList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        ListView taskList = (ListView) findViewById(R.id.task_listview);
+        mList = (ListView) findViewById(R.id.task_listview);
 
-        mAdapter = new TaskListAdapter(this, R.layout.task_row, taskList);
+        mAdapter = new TaskListAdapter(this, R.layout.task_row, mList);
 
-        taskList.setAdapter(mAdapter);
+        mList.setAdapter(mAdapter);
 
         fetchTasks();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_complete);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                fabClicked();
+            }
+        });
     }
 
 
@@ -112,6 +126,42 @@ public class ScheduleActivity extends Activity {
         };
         AsyncJSON jsonTask = new AsyncJSON(url, AsyncJSON.METHOD_GET, p, params);
         jsonTask.execute();
+    }
+
+    private void fabClicked() {
+
+        int pos = mList.getCheckedItemPosition();
+
+        if (pos == AdapterView.INVALID_POSITION)
+            return;
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String url = prefs.getString("api_source", null);
+
+        if (url == null) {
+            Toast.makeText(this, "Connection Error", Toast.LENGTH_LONG).show();
+        }
+
+        BasicNameValuePair[] params = {
+                new BasicNameValuePair("task", pos + 1 + ""),
+                new BasicNameValuePair("complete", "true")
+        };
+
+        final Context self = this;
+        AsyncJSON.JSONParser p = new AsyncJSON.JSONParser() {
+            @Override
+            public void parseJSON(JSONObject json) {
+                if (json == null) {
+                    Toast.makeText(self, "Connection Error",Toast.LENGTH_LONG).show();
+                }
+
+            }
+        };
+
+        AsyncJSON jsonTask = new AsyncJSON(url, AsyncJSON.METHOD_POST, p, params);
+        jsonTask.execute();
+        Log.d("Fab", pos + "");
+
     }
 
 }
