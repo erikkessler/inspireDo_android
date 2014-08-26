@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Dummy Title Long"
+        android:id="@+id/task_title"
         android:textSize="32sp"
         android:textColor="@color/task_title_text_color"/>
     <View
@@ -37,12 +38,14 @@
             android:textSize="16sp"
             android:fontFamily="sans-serif-condensed"
             android:textStyle="bold"
+            android:id="@+id/task_time_start"
             android:textColor="@color/black_text"
             android:gravity="center"/>
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:id="@+id/task_time_end"
             android:textSize="16sp"
             android:fontFamily="sans-serif-condensed"
             android:textColor="@color/black_text"
@@ -64,6 +67,7 @@
         android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"
         android:textColor="@color/black_secondary_text"
+        android:id="@+id/task_reward"
         android:text="20"
         android:gravity="center"/>
     <TextView
@@ -71,6 +75,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed"
         android:textColor="@color/black_secondary_text"
+        android:id="@+id/task_penalty"
         android:textSize="16sp"
         android:gravity="center"
         android:text="-10"/>
