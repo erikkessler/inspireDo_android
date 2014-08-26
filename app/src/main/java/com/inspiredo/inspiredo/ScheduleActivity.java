@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +18,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class ScheduleActivity extends Activity {
@@ -76,17 +81,29 @@ public class ScheduleActivity extends Activity {
                         JSONArray array = json.getJSONArray("tasks");
 
                         mAdapter.clear();
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject task = array.getJSONObject(i);
                             String title = task.getString("title");
-                            mAdapter.add(new TaskModel(title));
+                            Date start = df.parse(task.getString("start"));
+                            Date end = df.parse(task.getString("end"));
+                            int reward = task.getInt("reward");
+                            int penalty = task.getInt("penalty");
+                            boolean complete = task.getBoolean("complete");
+                            Log.d("New Task", title + "\n" + start + "\n" + end+ "\n" + reward + "\n" + penalty + "\n" + complete);
+                            mAdapter.add(new TaskModel(title, start, end,
+                                    reward, penalty, complete));
 
                         }
 
                         mAdapter.notifyDataSetChanged();
 
                     } catch (JSONException e) {
+
+                    } catch (ParseException e) {
 
                     }
                 }
