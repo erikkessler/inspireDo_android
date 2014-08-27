@@ -21,6 +21,7 @@ import org.json.JSONObject;
 public class SettingsActivity extends PreferenceActivity implements AsyncJSON.JSONParser {
 
 
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -51,10 +52,13 @@ public class SettingsActivity extends PreferenceActivity implements AsyncJSON.JS
      * to reflect its new value.
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+
+        private AsyncJSON mPendingJSON;
+
         @Override
         public boolean onPreferenceChange(final Preference preference, Object value) {
             final String stringValue = value.toString();
-            Log.d("JSON", stringValue);
+
 
             AsyncJSON.JSONParser p = new AsyncJSON.JSONParser() {
                 @Override
@@ -83,6 +87,7 @@ public class SettingsActivity extends PreferenceActivity implements AsyncJSON.JS
 
                     }
 
+                    mPendingJSON = null;
 
                 }
             };
@@ -90,9 +95,12 @@ public class SettingsActivity extends PreferenceActivity implements AsyncJSON.JS
             if (preference.getKey().equals("api_source") && stringValue.length()> 0) {
 
                 BasicNameValuePair[] params = {new BasicNameValuePair("connect", "test")};
-                AsyncJSON request = new AsyncJSON(stringValue, AsyncJSON.METHOD_GET,
+
+                if (mPendingJSON != null)
+                    mPendingJSON.cancel(true);
+                mPendingJSON = new AsyncJSON(stringValue, AsyncJSON.METHOD_GET,
                         p, params);
-                request.execute();
+                mPendingJSON.execute();
             }
 
 
@@ -117,10 +125,10 @@ public class SettingsActivity extends PreferenceActivity implements AsyncJSON.JS
 
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+        String summary = PreferenceManager
+                .getDefaultSharedPreferences(preference.getContext())
+                .getString(preference.getKey(), "");
+        preference.setSummary(summary);
     }
 
     @Override

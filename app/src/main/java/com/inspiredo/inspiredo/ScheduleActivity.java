@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -31,11 +32,13 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 
-public class ScheduleActivity extends Activity {
+public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener {
 
     private ArrayAdapter<TaskModel> mAdapter;
 
     private ListView mList;
+
+    private SwipeRefreshLayout mSwipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +51,6 @@ public class ScheduleActivity extends Activity {
 
         mList.setAdapter(mAdapter);
 
-        fetchTasks();
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_complete);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +59,14 @@ public class ScheduleActivity extends Activity {
                 fabClicked();
             }
         });
+
+        mSwipeLayout = (SwipeRefreshLayout)
+                findViewById(R.id.task_list_container);
+        mSwipeLayout.setOnRefreshListener(this);
+        mSwipeLayout.setColorSchemeResources(R.color.accent, R.color.primary,
+                R.color.accent, R.color.primary);
+
+        fetchTasks();
     }
 
 
@@ -81,6 +90,7 @@ public class ScheduleActivity extends Activity {
     }
 
     public void fetchTasks() {
+        mSwipeLayout.setRefreshing(true);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String url = prefs.getString("api_source", null);
 
@@ -92,6 +102,7 @@ public class ScheduleActivity extends Activity {
         AsyncJSON.JSONParser p = new AsyncJSON.JSONParser() {
             @Override
             public void parseJSON(JSONObject json) {
+                mSwipeLayout.setRefreshing(false);
                 if (json != null) {
                     try {
                         JSONArray array = json.getJSONArray("tasks");
@@ -176,4 +187,8 @@ public class ScheduleActivity extends Activity {
 
     }
 
+    @Override
+    public void onRefresh() {
+        fetchTasks();
+    }
 }
