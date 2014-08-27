@@ -4,32 +4,26 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:paddingBottom="24dp"
-    android:paddingTop="24dp"
+    android:paddingBottom="@dimen/row_padding"
+    android:paddingTop="@dimen/row_padding"
     android:background="@drawable/task_list_background">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/task_title_width"
             android:layout_height="wrap_content"
-            android:text="Dummy Title Long"
+            android:text="Daily Planning and Meditation"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
             android:id="@+id/task_title"
             android:textSize="32sp"
             android:layout_centerHorizontal="true"
             android:textColor="@color/task_title_text_color"/>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/task_title"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:id="@+id/task_complete_indicator"
-            android:src="@drawable/task_complete_indicator"/>
-    </RelativeLayout>
+
+
     <View
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -38,65 +32,92 @@
         android:background="@android:color/black"
         />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:gravity="center">
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
 
-        <TextView
-            android:layout_width="80dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="11:00 AM"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-condensed"
-            android:textStyle="bold"
-            android:id="@+id/task_time_start"
-            android:textColor="@color/black_text"
-            android:gravity="center"/>
-        <TextView
-            android:layout_width="80dp"
+            android:orientation="vertical"
+            android:id="@+id/task_details">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="11:00 AM"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textStyle="bold"
+                    android:id="@+id/task_time_start"
+                    android:textColor="@color/black_text"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:id="@+id/task_time_end"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="@color/black_text"
+                    android:textStyle="bold"
+                    android:text="12:00 PM"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="@color/black_secondary_text"
+                    android:id="@+id/task_reward"
+                    android:text="20"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="@color/black_secondary_text"
+                    android:id="@+id/task_penalty"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:text="-10"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:id="@+id/task_time_end"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/black_text"
-            android:textStyle="bold"
-            android:text="12:00 PM"/>
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:id="@+id/task_complete_indicator"
+            android:src="@drawable/task_complete_indicator"
+            android:layout_gravity="center"
+            />
+
+    </FrameLayout>
 
 
-    </LinearLayout>
-
-    <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center">
-
-    <TextView
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-condensed"
-        android:textColor="@color/black_secondary_text"
-        android:id="@+id/task_reward"
-        android:text="20"
-        android:gravity="center"/>
-    <TextView
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-condensed"
-        android:textColor="@color/black_secondary_text"
-        android:id="@+id/task_penalty"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:text="-10"/>
-
-
-</LinearLayout>
 
 
 

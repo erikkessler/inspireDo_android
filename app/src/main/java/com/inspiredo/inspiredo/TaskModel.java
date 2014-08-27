@@ -6,6 +6,8 @@ import java.util.Date;
  * Model fro a Task Object
  */
 public class TaskModel {
+
+    // Task properties
     private String mTitle;
     private Date mStart;
     private Date mEnd;
@@ -28,27 +30,33 @@ public class TaskModel {
 
     }
 
+    // Title
     public String getTitle() {
         return mTitle;
     }
     public void setTitle(String title) { mTitle = title; }
 
+    // Start time
     public Date getStart() {
         return mStart;
     }
     public void setStart(Date start) { mStart = start; }
 
+    // End time
     public Date getEnd() {
         return mEnd;
     }
     public void setEnd(Date end) { mEnd = end;}
 
+    // Reward
     public int getReward() { return mReward; }
     public void setReward(int reward) { mReward = reward; }
 
+    // Penalty
     public int getPenalty() { return mPenalty; }
     public void setPenalty(int penalty) { mPenalty = penalty; }
 
+    // Complete
     public boolean getComplete() { return mComplete; }
     public void setComplete(boolean complete) { mComplete = complete;}
     public boolean toggleComplete() {

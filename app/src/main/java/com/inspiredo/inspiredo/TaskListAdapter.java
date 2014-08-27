@@ -1,16 +1,13 @@
 package com.inspiredo.inspiredo;
 
 import android.content.Context;
-import android.graphics.drawable.TransitionDrawable;
 import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -20,13 +17,10 @@ import java.text.SimpleDateFormat;
  */
 public class TaskListAdapter extends ArrayAdapter<TaskModel> {
 
-    private int mActivePos;
-
     private int mRowResource;
 
-    public TaskListAdapter(Context context, int resource, ListView list) {
+    public TaskListAdapter(Context context, int resource) {
         super(context, resource);
-        mActivePos = list.getSelectedItemPosition();
         mRowResource = resource;
     }
 
@@ -39,9 +33,10 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
             convertView = inflater.inflate(mRowResource, null);
         }
 
+        // Get the Task
         TaskModel task = getItem(position);
-        boolean active = position == mActivePos;
 
+        //Set all the TextViews
         TextView title = (TextView) convertView.findViewById(R.id.task_title);
         title.setText(task.getTitle());
 
@@ -58,11 +53,19 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
         TextView penalty = (TextView) convertView.findViewById(R.id.task_penalty);
         penalty.setText(Html.fromHtml(task.getPenalty() + "<small><sup>pts.</sup></small>"));
 
+        // Set the indicator
         ImageView indicator = (ImageView) convertView.findViewById(R.id.task_complete_indicator);
         if (task.getComplete())
             indicator.setVisibility(View.VISIBLE);
         else
             indicator.setVisibility(View.GONE);
+
+        // Set the details
+        LinearLayout details = (LinearLayout) convertView.findViewById(R.id.task_details);
+        if (task.getComplete())
+            details.setVisibility(View.GONE);
+        else
+            details.setVisibility(View.VISIBLE);
 
         return convertView;
     }

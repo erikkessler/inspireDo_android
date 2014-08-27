@@ -59,6 +59,7 @@ public class FloatingActionButton extends View {
             mBitmap = ((BitmapDrawable) drawable).getBitmap();
         }
         setWillNotDraw(false);
+
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         WindowManager mWindowManager = (WindowManager)

@@ -1,32 +1,19 @@
 <FrameLayout
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/task_list_container">
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:choiceMode="singleChoice"
             android:layout_gravity="center"
             android:id="@+id/task_listview" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-
-
-    <com.inspiredo.inspiredo.FloatingActionButton
-        android:id="@+id/fab_complete"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        app:color="@color/accent"
-        app:icon="@drawable/ic_action_accept"/>
 
 </FrameLayout>
