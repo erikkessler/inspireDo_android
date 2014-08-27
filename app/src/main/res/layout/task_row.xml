@@ -27,6 +27,7 @@
             android:layout_toRightOf="@+id/task_title"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:id="@+id/task_complete_indicator"
             android:src="@drawable/task_complete_indicator"/>
     </RelativeLayout>
     <View

@@ -51,6 +51,10 @@ public class TaskModel {
 
     public boolean getComplete() { return mComplete; }
     public void setComplete(boolean complete) { mComplete = complete;}
+    public boolean toggleComplete() {
+        mComplete = !mComplete;
+        return  mComplete;
+    }
 
     @Override
     public String toString() {

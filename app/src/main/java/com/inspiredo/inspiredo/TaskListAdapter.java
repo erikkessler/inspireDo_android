@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -54,6 +55,12 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
 
         TextView penalty = (TextView) convertView.findViewById(R.id.task_penalty);
         penalty.setText(task.getPenalty() + "");
+
+        ImageView indicator = (ImageView) convertView.findViewById(R.id.task_complete_indicator);
+        if (task.getComplete())
+            indicator.setVisibility(View.VISIBLE);
+        else
+            indicator.setVisibility(View.GONE);
 
         return convertView;
     }

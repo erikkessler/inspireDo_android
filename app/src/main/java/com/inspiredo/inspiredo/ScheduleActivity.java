@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -135,6 +137,9 @@ public class ScheduleActivity extends Activity {
         if (pos == AdapterView.INVALID_POSITION)
             return;
 
+        TaskModel task = mAdapter.getItem(pos);
+        LinearLayout row = (LinearLayout) mList.getChildAt(pos - mList.getFirstVisiblePosition());
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String url = prefs.getString("api_source", null);
 
@@ -144,7 +149,7 @@ public class ScheduleActivity extends Activity {
 
         BasicNameValuePair[] params = {
                 new BasicNameValuePair("task", pos + 1 + ""),
-                new BasicNameValuePair("complete", "true")
+                new BasicNameValuePair("complete", !task.getComplete() + "")
         };
 
         final Context self = this;
@@ -160,7 +165,14 @@ public class ScheduleActivity extends Activity {
 
         AsyncJSON jsonTask = new AsyncJSON(url, AsyncJSON.METHOD_POST, p, params);
         jsonTask.execute();
-        Log.d("Fab", pos + "");
+
+        int visibility = task.toggleComplete() ? View.VISIBLE : View.GONE;
+
+        if (row == null)
+            return;
+
+        ImageView indicator = (ImageView) row.findViewById(R.id.task_complete_indicator);
+        indicator.setVisibility(visibility);
 
     }
 
