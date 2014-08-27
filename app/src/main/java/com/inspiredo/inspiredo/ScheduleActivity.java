@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -14,6 +18,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -48,7 +53,7 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
 
     // Task list and its adapter
     private ArrayAdapter<TaskModel> mAdapter;
-    private ListView mList;
+    private SwipeList mList;
 
     // Container for the list to allow for Swipe-to-refresh
     private SwipeRefreshLayout mSwipeLayout;
@@ -60,7 +65,8 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         setContentView(R.layout.activity_schedule);
 
         // Instantiate the list and adapter
-        mList = (ListView) findViewById(R.id.task_listview);
+        mList = (SwipeList) findViewById(R.id.task_listview);
+        mList.setScheduleActivity(this);
         mAdapter = new TaskListAdapter(this, R.layout.task_row);
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -107,30 +113,14 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         leftDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAdapter.clear();
-                mAdapter.notifyDataSetChanged();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime ( mDate ); // convert your date to Calendar object
-                int daysToDecrement = -1;
-                cal.add(Calendar.DATE, daysToDecrement);
-                mDate = cal.getTime();
-                fetchTasks(mDate);
-                mCurrentDayView.setText(format.format(mDate));
+                shiftDay(-1);
             }
         });
 
         rightDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAdapter.clear();
-                mAdapter.notifyDataSetChanged();
-                Calendar cal = Calendar.getInstance();
-                cal.setTime ( mDate ); // convert your date to Calendar object
-                int daysToDecrement = 1;
-                cal.add(Calendar.DATE, daysToDecrement);
-                mDate = cal.getTime();
-                fetchTasks(mDate);
-                mCurrentDayView.setText(format.format(mDate));
+                shiftDay(1);
             }
         });
 
@@ -152,6 +142,18 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
 
         // Fill the list
         fetchTasks(mDate);
+    }
+
+    public void shiftDay(int increment) {
+        mAdapter.clear();
+        mAdapter.notifyDataSetChanged();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime ( mDate ); // convert your date to Calendar object
+        int daysToDecrement = increment;
+        cal.add(Calendar.DATE, daysToDecrement);
+        mDate = cal.getTime();
+        fetchTasks(mDate);
+        mCurrentDayView.setText(format.format(mDate));
     }
 
 
@@ -303,6 +305,103 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         LinearLayout details = (LinearLayout) row.findViewById(R.id.task_details);
         visibility = task.getComplete() ? View.GONE : View.VISIBLE;
         details.setVisibility(visibility);
+    }
+
+    class ListViewTouchListener implements View.OnTouchListener {
+        boolean firstTouch;
+        int initialX;
+        int initialY;
+
+        int lastX;
+        int lastY;
+
+        boolean isSwiping;
+
+        private BitmapDrawable mHoverCell;
+        private Rect mHoverCellCurrentBounds;
+        private Rect mHoverCellOriginalBounds;
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            switch (motionEvent.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    Log.d("MotionEvent", "Down");
+                    initialX = lastX = (int) motionEvent.getX();
+                    initialY = lastY = (int) motionEvent.getY();
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    Log.d("MotionEvent", "Cancel");
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int deltaX = (int) motionEvent.getX() - lastX;
+                    int deltaY = (int) motionEvent.getY() - lastY;
+
+                    if (!isSwiping) {
+                        int totalX = (int) motionEvent.getX() - initialX;
+                        int totalY = (int) motionEvent.getY() - initialY;
+                        Log.d("MotionEvent", totalX + "");
+                        if (totalX >= 60 && (totalX >= (totalY / 2))) {
+                            Log.d("MotionEvent", "Swiping left");
+                            mHoverCell = getAndAddHoverView(mList);
+                            isSwiping = true;
+                        }
+                    }
+
+                    lastX = (int) motionEvent.getX();
+                    lastY = (int) motionEvent.getY();
+                    Log.d("MotionEvent", "Move");
+                    break;
+                case MotionEvent.ACTION_UP:
+                    isSwiping = false;
+                    Log.d("MotionEvent", "Up");
+                    break;
+
+            }
+            return false;
+        }
+
+        private BitmapDrawable getAndAddHoverView(View v) {
+
+            int w = v.getWidth();
+            int h = v.getHeight();
+            int top = v.getTop();
+            int left = v.getLeft();
+
+            Bitmap b = getBitmapWithBorder(v);
+
+            BitmapDrawable drawable = new BitmapDrawable(getResources(), b);
+
+            mHoverCellOriginalBounds = new Rect(left, top, left + w, top + h);
+            mHoverCellCurrentBounds = new Rect(mHoverCellOriginalBounds);
+
+            drawable.setBounds(mHoverCellCurrentBounds);
+
+            return drawable;
+        }
+
+        /**
+         * Draws a black border over the screenshot of the view passed in.
+         */
+        private Bitmap getBitmapWithBorder(View v) {
+            Bitmap bitmap = getBitmapFromView(v);
+            Canvas can = new Canvas(bitmap);
+
+            can.drawBitmap(bitmap, 0, 0, null);
+
+            return bitmap;
+        }
+
+        /**
+         * Returns a bitmap showing a screenshot of the view passed in.
+         */
+        private Bitmap getBitmapFromView(View v) {
+            Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+            bitmap.eraseColor(getResources().getColor(R.color.primary_lightest)); // Set BG color
+            Canvas canvas = new Canvas(bitmap);
+            v.draw(canvas);
+            return bitmap;
+        }
     }
 
     @Override
