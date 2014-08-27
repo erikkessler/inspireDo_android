@@ -2,6 +2,8 @@ package com.inspiredo.inspiredo;
 
 import android.content.Context;
 import android.graphics.drawable.TransitionDrawable;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,10 +53,10 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
         end.setText(format.format(task.getEnd()));
 
         TextView reward = (TextView) convertView.findViewById(R.id.task_reward);
-        reward.setText(task.getReward() + "");
+        reward.setText(Html.fromHtml(task.getReward() + "<small><sup>pts.</sup></small>"));
 
         TextView penalty = (TextView) convertView.findViewById(R.id.task_penalty);
-        penalty.setText(task.getPenalty() + "");
+        penalty.setText(Html.fromHtml(task.getPenalty() + "<small><sup>pts.</sup></small>"));
 
         ImageView indicator = (ImageView) convertView.findViewById(R.id.task_complete_indicator);
         if (task.getComplete())
