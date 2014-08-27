@@ -1,7 +1,57 @@
-<FrameLayout
+<LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:id="@+id/list_header"
+        android:background="@color/accent_transparent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="32sp"
+            android:fontFamily="sans-serif-thin"
+            android:layout_alignParentLeft="true"
+            android:clickable="true"
+            android:background="@drawable/day_selector_background"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/left_carrot"
+            android:id="@+id/left_day"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="32sp"
+            android:fontFamily="sans-serif-thin"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="8/27/14"
+            android:id="@+id/current_day"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="32sp"
+            android:clickable="true"
+            android:fontFamily="sans-serif-thin"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/day_selector_background"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/right_carrot"
+            android:id="@+id/right_day"/>
+
+    </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="fill_parent"
@@ -16,4 +66,4 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-</FrameLayout>
+</LinearLayout>

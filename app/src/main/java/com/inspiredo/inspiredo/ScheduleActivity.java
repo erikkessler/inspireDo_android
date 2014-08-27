@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.message.BasicNameValuePair;
@@ -26,6 +31,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -33,6 +39,12 @@ import java.util.TimeZone;
  * Launched Activity. Shows a list of today's tasks and allows user to select/deselect them
  */
 public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener {
+
+    private Date mDate;
+
+    private TextView mCurrentDayView;
+
+    private  static  SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
 
     // Task list and its adapter
     private ArrayAdapter<TaskModel> mAdapter;
@@ -65,8 +77,81 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         mSwipeLayout.setColorSchemeResources(R.color.accent, R.color.primary,
                 R.color.accent, R.color.primary);
 
+        // Day navigation
+        mCurrentDayView = (TextView) findViewById(R.id.current_day);
+        final TextView rightDay = (TextView) findViewById(R.id.right_day);
+        final TextView leftDay = (TextView) findViewById(R.id.left_day);
+
+        mCurrentDayView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+                Date today = new Date();
+                if (format.format(today).equals(format.format(mDate))) {
+                    mCurrentDayView.setPaintFlags(
+                            mCurrentDayView.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        // Move left/right
+        leftDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAdapter.clear();
+                mAdapter.notifyDataSetChanged();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime ( mDate ); // convert your date to Calendar object
+                int daysToDecrement = -1;
+                cal.add(Calendar.DATE, daysToDecrement);
+                mDate = cal.getTime();
+                fetchTasks(mDate);
+                mCurrentDayView.setText(format.format(mDate));
+            }
+        });
+
+        rightDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAdapter.clear();
+                mAdapter.notifyDataSetChanged();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime ( mDate ); // convert your date to Calendar object
+                int daysToDecrement = 1;
+                cal.add(Calendar.DATE, daysToDecrement);
+                mDate = cal.getTime();
+                fetchTasks(mDate);
+                mCurrentDayView.setText(format.format(mDate));
+            }
+        });
+
+        mCurrentDayView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAdapter.clear();
+                mAdapter.notifyDataSetChanged();
+                mDate = new Date();
+                fetchTasks(mDate);
+                mCurrentDayView.setText(format.format(mDate));
+            }
+        });
+
+
+        // Set to today's date
+        mDate = new Date();
+        mCurrentDayView.setText(format.format(mDate));
+
         // Fill the list
-        fetchTasks();
+        fetchTasks(mDate);
     }
 
 
@@ -93,7 +178,7 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
      * Makes a call to the api to get the tasks and then populates the list with the
      * response
      */
-    public void fetchTasks() {
+    public void fetchTasks(Date date) {
         // Show the refreshing animation
         mSwipeLayout.setRefreshing(true);
 
@@ -109,7 +194,8 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         }
 
         // No query params
-        BasicNameValuePair[] params = {};
+        BasicNameValuePair[] params = {
+                new BasicNameValuePair("date", date.toString().replace(" ", "%20"))};
 
         // Handles the JSON response
         AsyncJSON.JSONParser p = new AsyncJSON.JSONParser() {
@@ -221,6 +307,6 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
 
     @Override
     public void onRefresh() {
-        fetchTasks();
+        fetchTasks(mDate);
     }
 }

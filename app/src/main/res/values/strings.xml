@@ -6,5 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="no_url_error">Specify URL in Settings</string>
     <string name="connection_error">Connection Error</string>
+    <string name="left_carrot"><![CDATA[<]]></string>
+    <string name="right_carrot"><![CDATA[>]]></string>
 
 </resources>
