@@ -19,9 +19,14 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
 
     private int mRowResource;
 
+    private Context mContext;
+
+    private static SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+
     public TaskListAdapter(Context context, int resource) {
         super(context, resource);
         mRowResource = resource;
+        mContext = context;
     }
 
     @Override
@@ -40,7 +45,7 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
         TextView title = (TextView) convertView.findViewById(R.id.task_title);
         title.setText(task.getTitle());
 
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+
         TextView start = (TextView) convertView.findViewById(R.id.task_time_start);
         start.setText(format.format(task.getStart()));
 
@@ -53,20 +58,51 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
         TextView penalty = (TextView) convertView.findViewById(R.id.task_penalty);
         penalty.setText(Html.fromHtml(task.getPenalty() + "<small><sup>pts.</sup></small>"));
 
+        setIndicators(convertView, task);
+
+
+        return convertView;
+    }
+
+    public void setIndicators(View view, TaskModel task) {
+        if (view == null)
+            return;
+
         // Set the indicator
-        ImageView indicator = (ImageView) convertView.findViewById(R.id.task_complete_indicator);
-        if (task.getComplete())
+        ImageView indicator = (ImageView) view.findViewById(R.id.task_complete_indicator);
+        if (task.getComplete()) {
+            indicator.setImageDrawable(mContext.getResources()
+                    .getDrawable(R.drawable.ic_action_accept_dark));
             indicator.setVisibility(View.VISIBLE);
-        else
+        } else if (task.getState() == TaskModel.ENDED) {
+            indicator.setImageDrawable(mContext.getResources()
+                    .getDrawable(R.drawable.ic_action_cancel_dark));
+            indicator.setVisibility(View.VISIBLE);
+        } else
             indicator.setVisibility(View.GONE);
 
         // Set the details
-        LinearLayout details = (LinearLayout) convertView.findViewById(R.id.task_details);
-        if (task.getComplete())
-            details.setVisibility(View.GONE);
-        else
+        LinearLayout details = (LinearLayout) view.findViewById(R.id.task_details);
+        if (task.getState() == TaskModel.UNSTARTED)
             details.setVisibility(View.VISIBLE);
+        else
+            details.setVisibility(View.GONE);
 
-        return convertView;
+        // Set Time
+        LinearLayout time = (LinearLayout) view.findViewById(R.id.actual_time);
+        TextView aStart = (TextView) view.findViewById(R.id.actual_start);
+        if (task.getAStart() != null )
+            aStart.setText(format.format(task.getAStart()));
+
+        TextView aEnd = (TextView) view.findViewById(R.id.actual_end);
+        if (task.getAEnd() != null )
+            aEnd.setText(format.format(task.getAEnd()));
+        else if (task.getState() == TaskModel.STARTED)
+            aEnd.setText(format.format(task.getProjectedEnd()));
+
+        if (task.getState() == TaskModel.UNSTARTED)
+            time.setVisibility(View.GONE);
+        else
+            time.setVisibility(View.VISIBLE);
     }
 }

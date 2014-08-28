@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * Make call to url for JSON response
@@ -30,9 +31,9 @@ public class AsyncJSON extends AsyncTask<String, String, String> {
     private String mURL;
     private int mMethod;
     private JSONParser mParser;
-    private BasicNameValuePair[] mParams;
+    private List<BasicNameValuePair> mParams;
 
-    public AsyncJSON(String url, int method, JSONParser parser, BasicNameValuePair[] params) {
+    public AsyncJSON(String url, int method, JSONParser parser, List<BasicNameValuePair> params) {
         mURL = url;
         mMethod = method;
         mParams = params;
@@ -60,7 +61,7 @@ public class AsyncJSON extends AsyncTask<String, String, String> {
         String response = "";
         String query = "";
 
-        if (mParams.length > 0)
+        if (mParams.size() > 0)
             query = "?";
             for (BasicNameValuePair pair : mParams) {
                 query += pair.getName() + "="+ pair.getValue() + "&";
@@ -70,6 +71,8 @@ public class AsyncJSON extends AsyncTask<String, String, String> {
         HttpUriRequest request = null;
         HttpClient client = new DefaultHttpClient();
 
+        query = query.replace(" ", "%20");
+        Log.d("QUERY", query);
 
         if (mMethod == METHOD_GET) {
             request = new HttpGet(mURL + query);

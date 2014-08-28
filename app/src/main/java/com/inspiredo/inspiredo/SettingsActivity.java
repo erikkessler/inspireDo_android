@@ -14,6 +14,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list.
@@ -94,7 +97,8 @@ public class SettingsActivity extends PreferenceActivity implements AsyncJSON.JS
 
             if (preference.getKey().equals("api_source") && stringValue.length()> 0) {
 
-                BasicNameValuePair[] params = {new BasicNameValuePair("connect", "test")};
+                List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+                params.add(new BasicNameValuePair("connect", "test"));
 
                 if (mPendingJSON != null)
                     mPendingJSON.cancel(true);

@@ -108,12 +108,40 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:id="@+id/task_complete_indicator"
-            android:src="@drawable/task_complete_indicator"
+            android:src="@drawable/ic_action_cancel_dark"
             android:layout_gravity="center"
             />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:id="@+id/actual_time">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="24dp"
+                android:id="@+id/actual_start"
+                android:text="12:00AM"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black_text"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="24dp"
+                android:id="@+id/actual_end"
+                android:text="1:00 PM"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@color/black_secondary_text"/>
+        </LinearLayout>
 
     </FrameLayout>
 

@@ -4,27 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +26,10 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 /**
@@ -52,7 +44,7 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
     private  static  SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
 
     // Task list and its adapter
-    private ArrayAdapter<TaskModel> mAdapter;
+    private TaskListAdapter mAdapter;
     private SwipeList mList;
 
     // Container for the list to allow for Swipe-to-refresh
@@ -72,7 +64,7 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                completeTask(i, view);
+                touchTask(i, view);
             }
         });
 
@@ -175,8 +167,8 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         }
 
         // No query params
-        BasicNameValuePair[] params = {
-                new BasicNameValuePair("date", date.toString().replace(" ", "%20"))};
+        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+        params.add(new BasicNameValuePair("date", date.toString()));
 
         // Handles the JSON response
         AsyncJSON.JSONParser p = new AsyncJSON.JSONParser() {
@@ -205,13 +197,28 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
                             String title = task.getString("title");
                             Date start = df.parse(task.getString("start"));
                             Date end = df.parse(task.getString("end"));
+
+                            Date aStart;
+                            try {
+                                aStart = df.parse(task.getString("ac_start"));
+                            } catch (ParseException e) {
+                                aStart = null;
+                            }
+
+                            Date aEnd;
+                            try {
+                                aEnd = df.parse(task.getString("ac_end"));
+                            } catch (ParseException e) {
+                                aEnd = null;
+                            }
+
                             int reward = task.getInt("reward");
                             int penalty = task.getInt("penalty");
                             boolean complete = task.getBoolean("complete");
 
                             // Add new TaskModel to the adapter
                             mAdapter.add(new TaskModel(title, start, end,
-                                    reward, penalty, complete));
+                                    reward, penalty, complete, aStart, aEnd));
 
                         }
 
@@ -235,7 +242,7 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
     }
 
     // Complete the Task at the given position
-    private void completeTask(int pos, View row) {
+    private void touchTask(int pos, View row) {
 
         // Get the Task and its View
         TaskModel task = mAdapter.getItem(pos);
@@ -250,11 +257,31 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
             return;
         }
 
-        // Set the query params: Task number and if it complete
-        BasicNameValuePair[] params = {
-                new BasicNameValuePair("task", pos + 1 + ""),
-                new BasicNameValuePair("complete", !task.getComplete() + "")
-        };
+        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+        params.add(new BasicNameValuePair("task", pos + 1 + ""));
+
+
+        if (task.getState() == TaskModel.UNSTARTED) {
+            Date d = new Date();
+            task.setAStart(d);
+            task.setComplete(false);
+            params.add(new BasicNameValuePair("start", d.toString()));
+        } else if (task.getState() == TaskModel.STARTED) {
+            Date d = new Date();
+            task.setAEnd(d);
+            if (d.getTime() >= task.getProjectedEnd().getTime() )
+                task.setComplete(true);
+            else
+                task.setComplete(false);
+            params.add(new BasicNameValuePair("end", d.toString()));
+        } else {
+            task.setComplete(false);
+            task.setAStart(null);
+            task.setAEnd(null);
+            params.add(new BasicNameValuePair("end", ""));
+            params.add(new BasicNameValuePair("start", ""));
+        }
+
 
         // Handle the response: Alert connection Error
         final Context self = this;
@@ -272,115 +299,7 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         AsyncJSON jsonTask = new AsyncJSON(url, AsyncJSON.METHOD_POST, p, params);
         jsonTask.execute();
 
-        // Set the indicator and details
-        int visibility = task.toggleComplete() ? View.VISIBLE : View.GONE;
-
-        if (row == null)
-            return; // If row not visible return
-
-        ImageView indicator = (ImageView) row.findViewById(R.id.task_complete_indicator);
-        indicator.setVisibility(visibility);
-
-        LinearLayout details = (LinearLayout) row.findViewById(R.id.task_details);
-        visibility = task.getComplete() ? View.GONE : View.VISIBLE;
-        details.setVisibility(visibility);
-    }
-
-    class ListViewTouchListener implements View.OnTouchListener {
-        boolean firstTouch;
-        int initialX;
-        int initialY;
-
-        int lastX;
-        int lastY;
-
-        boolean isSwiping;
-
-        private BitmapDrawable mHoverCell;
-        private Rect mHoverCellCurrentBounds;
-        private Rect mHoverCellOriginalBounds;
-
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-
-            switch (motionEvent.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    Log.d("MotionEvent", "Down");
-                    initialX = lastX = (int) motionEvent.getX();
-                    initialY = lastY = (int) motionEvent.getY();
-                    break;
-                case MotionEvent.ACTION_CANCEL:
-                    Log.d("MotionEvent", "Cancel");
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    int deltaX = (int) motionEvent.getX() - lastX;
-                    int deltaY = (int) motionEvent.getY() - lastY;
-
-                    if (!isSwiping) {
-                        int totalX = (int) motionEvent.getX() - initialX;
-                        int totalY = (int) motionEvent.getY() - initialY;
-                        Log.d("MotionEvent", totalX + "");
-                        if (totalX >= 60 && (totalX >= (totalY / 2))) {
-                            Log.d("MotionEvent", "Swiping left");
-                            mHoverCell = getAndAddHoverView(mList);
-                            isSwiping = true;
-                        }
-                    }
-
-                    lastX = (int) motionEvent.getX();
-                    lastY = (int) motionEvent.getY();
-                    Log.d("MotionEvent", "Move");
-                    break;
-                case MotionEvent.ACTION_UP:
-                    isSwiping = false;
-                    Log.d("MotionEvent", "Up");
-                    break;
-
-            }
-            return false;
-        }
-
-        private BitmapDrawable getAndAddHoverView(View v) {
-
-            int w = v.getWidth();
-            int h = v.getHeight();
-            int top = v.getTop();
-            int left = v.getLeft();
-
-            Bitmap b = getBitmapWithBorder(v);
-
-            BitmapDrawable drawable = new BitmapDrawable(getResources(), b);
-
-            mHoverCellOriginalBounds = new Rect(left, top, left + w, top + h);
-            mHoverCellCurrentBounds = new Rect(mHoverCellOriginalBounds);
-
-            drawable.setBounds(mHoverCellCurrentBounds);
-
-            return drawable;
-        }
-
-        /**
-         * Draws a black border over the screenshot of the view passed in.
-         */
-        private Bitmap getBitmapWithBorder(View v) {
-            Bitmap bitmap = getBitmapFromView(v);
-            Canvas can = new Canvas(bitmap);
-
-            can.drawBitmap(bitmap, 0, 0, null);
-
-            return bitmap;
-        }
-
-        /**
-         * Returns a bitmap showing a screenshot of the view passed in.
-         */
-        private Bitmap getBitmapFromView(View v) {
-            Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
-            bitmap.eraseColor(getResources().getColor(R.color.primary_lightest)); // Set BG color
-            Canvas canvas = new Canvas(bitmap);
-            v.draw(canvas);
-            return bitmap;
-        }
+        mAdapter.setIndicators(row, task);
     }
 
     @Override
