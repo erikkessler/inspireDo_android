@@ -35,6 +35,8 @@ public class SwipeList extends ListView {
 
     boolean isSwiping;
 
+    int state;
+
     private BitmapDrawable mHoverCell;
     private Rect mHoverCellCurrentBounds;
     private Rect mHoverCellOriginalBounds;
@@ -88,33 +90,33 @@ public class SwipeList extends ListView {
                 initialY = lastY = (int) motionEvent.getY();
                 break;
             case MotionEvent.ACTION_CANCEL:
-                if (isSwiping) {
-                    isSwiping = false;
+                if (state == 1) {
                     swipeEnded();
                 }
+                state = 0;
                 Log.d("MotionEvent", "Cancel");
                 break;
             case MotionEvent.ACTION_MOVE:
                 deltaX = (int) motionEvent.getX() - lastX;
+                int deltaY = (int) motionEvent.getY() - lastY;
                 int totalX = (int) motionEvent.getX() - initialX;
                 int totalY = (int) motionEvent.getY() - initialY;
                 lastX = (int) motionEvent.getX();
                 lastY = (int) motionEvent.getY();
 
-                Log.d("Delta", deltaX + "");
-
-                if (!isSwiping) {
-
-                    Log.d("MotionEvent", totalX + "");
-                    if (Math.abs(totalX) >= 20 && (Math.abs(totalX) >= (Math.abs(totalY) * 2))) {
-                        Log.d("MotionEvent", "Swiping left");
+                if (state == 0) {
+                    Log.d("Motion", deltaX + " " + deltaY);
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        state = 1;
                         mHoverCell = getAndAddHoverView(this);
-                        isSwiping = true;
                         return true;
+                    } else {
+                        state = 2;
                     }
+
                 }
 
-                if (isSwiping) {
+                if (state == 1) {
                     mHoverCellCurrentBounds.offsetTo(mHoverCellOriginalBounds.left + totalX,
                             mHoverCellOriginalBounds.top);
                     mHoverCell.setBounds(mHoverCellCurrentBounds);
@@ -126,10 +128,10 @@ public class SwipeList extends ListView {
                 Log.d("MotionEvent", "Move");
                 break;
             case MotionEvent.ACTION_UP:
-                if (isSwiping) {
-                    isSwiping = false;
+                if (state == 1) {
                     swipeEnded();
                 }
+                state = 0;
                 Log.d("MotionEvent", "Up");
                 this.setPressed(false);
                 break;
@@ -182,10 +184,11 @@ public class SwipeList extends ListView {
 
     private void swipeEnded() {
         Log.d("Bounds", "Current Right " + mHoverCellCurrentBounds.right + " Current left " + mHoverCellCurrentBounds.left + " width " + mWidth  );
-        if(mHoverCellCurrentBounds.left > (mWidth / 2) || deltaX > 80) {
+        Log.d("Motion", deltaX + "");
+        if(mHoverCellCurrentBounds.left > (mWidth / 2) || deltaX > 15) {
             mHoverCellCurrentBounds.offsetTo(mWidth, mHoverCellOriginalBounds.top);
             mScheduleActivity.shiftDay(-1);
-        } else if (mHoverCellCurrentBounds.right < (mWidth / 2) || deltaX < -80) {
+        } else if (mHoverCellCurrentBounds.right < (mWidth / 2) || deltaX < -15) {
             mHoverCellCurrentBounds.offsetTo(-mWidth, mHoverCellCurrentBounds.top);
             mScheduleActivity.shiftDay(1);
         } else
