@@ -1,6 +1,7 @@
 package com.inspiredo.inspiredo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,18 +20,18 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
 
     private int mRowResource;
 
-    private Context mContext;
+    private ScheduleActivity mContext;
 
     private static SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
 
-    public TaskListAdapter(Context context, int resource) {
+    public TaskListAdapter(ScheduleActivity context, int resource) {
         super(context, resource);
         mRowResource = resource;
         mContext = context;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         // Inflate the view if needed
         if (convertView == null) {
@@ -39,7 +40,7 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
         }
 
         // Get the Task
-        TaskModel task = getItem(position);
+        final TaskModel task = getItem(position);
 
         //Set all the TextViews
         TextView title = (TextView) convertView.findViewById(R.id.task_title);
@@ -60,6 +61,18 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
 
         setIndicators(convertView, task);
 
+        // Timer
+        ImageView timer = (ImageView) convertView.findViewById(R.id.timer_start);
+        timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                long endTime = task.getProjectedEnd().getTime();
+                Intent i = new Intent(mContext, TimerActivity.class);
+                i.putExtra(TimerActivity.END_TIME, endTime);
+                i.putExtra(TimerActivity.TASK_NUM, position);
+                mContext.startActivityForResult(i, ScheduleActivity.START_TIMER);
+            }
+        });
 
         return convertView;
     }
@@ -104,5 +117,12 @@ public class TaskListAdapter extends ArrayAdapter<TaskModel> {
             time.setVisibility(View.GONE);
         else
             time.setVisibility(View.VISIBLE);
+
+        // Timer Icon
+        ImageView timer = (ImageView) view.findViewById(R.id.timer_start);
+        if (task.getState() == TaskModel.STARTED)
+            timer.setVisibility(View.VISIBLE);
+        else
+            timer.setVisibility(View.GONE);
     }
 }

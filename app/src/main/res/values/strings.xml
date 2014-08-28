@@ -8,5 +8,6 @@
     <string name="connection_error">Connection Error</string>
     <string name="left_carrot"><![CDATA[<]]></string>
     <string name="right_carrot"><![CDATA[>]]></string>
+    <string name="title_activity_timer">TimerActivity</string>
 
 </resources>

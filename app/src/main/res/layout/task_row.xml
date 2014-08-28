@@ -146,7 +146,12 @@
     </FrameLayout>
 
 
-
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/day_selector_background"
+        android:id="@+id/timer_start"
+        android:src="@drawable/ic_action_timer"/>
 
 
 </LinearLayout>

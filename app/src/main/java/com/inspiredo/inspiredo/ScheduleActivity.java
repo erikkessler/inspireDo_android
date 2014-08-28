@@ -50,6 +50,8 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
     // Container for the list to allow for Swipe-to-refresh
     private SwipeRefreshLayout mSwipeLayout;
 
+    public static final int START_TIMER = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -305,5 +307,19 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         fetchTasks(mDate);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case START_TIMER:
+                long endMillis = data.getLongExtra(TimerActivity.END_TIME, -1);
+                int taskNum = data.getIntExtra(TimerActivity.TASK_NUM, -1);
+                if (endMillis != -1 && taskNum != -1) {
+                    View v = mList.getChildAt(taskNum - mList.getFirstVisiblePosition());
+                    touchTask(taskNum, v);
+                }
+                break;
+        }
     }
 }
