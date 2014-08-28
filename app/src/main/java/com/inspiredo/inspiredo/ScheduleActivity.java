@@ -88,27 +88,6 @@ public class ScheduleActivity extends Activity implements SwipeRefreshLayout.OnR
         final TextView rightDay = (TextView) findViewById(R.id.right_day);
         final TextView leftDay = (TextView) findViewById(R.id.left_day);
 
-        mCurrentDayView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                Date today = new Date();
-                if (format.format(today).equals(format.format(mDate))) {
-                    mCurrentDayView.setPaintFlags(
-                            mCurrentDayView.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
-                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
         // Move left/right
         leftDay.setOnClickListener(new View.OnClickListener() {
             @Override
