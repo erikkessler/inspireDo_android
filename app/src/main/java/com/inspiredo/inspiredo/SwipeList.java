@@ -31,6 +31,8 @@ public class SwipeList extends ListView {
     int lastX;
     int lastY;
 
+    int deltaX;
+
     boolean isSwiping;
 
     private BitmapDrawable mHoverCell;
@@ -93,15 +95,18 @@ public class SwipeList extends ListView {
                 Log.d("MotionEvent", "Cancel");
                 break;
             case MotionEvent.ACTION_MOVE:
-                int deltaX = (int) motionEvent.getX() - lastX;
-                int deltaY = (int) motionEvent.getY() - lastY;
+                deltaX = (int) motionEvent.getX() - lastX;
                 int totalX = (int) motionEvent.getX() - initialX;
                 int totalY = (int) motionEvent.getY() - initialY;
+                lastX = (int) motionEvent.getX();
+                lastY = (int) motionEvent.getY();
+
+                Log.d("Delta", deltaX + "");
 
                 if (!isSwiping) {
 
                     Log.d("MotionEvent", totalX + "");
-                    if (Math.abs(totalX) >= 40 && (Math.abs(totalX) >= (Math.abs(totalY) / 2))) {
+                    if (Math.abs(totalX) >= 20 && (Math.abs(totalX) >= (Math.abs(totalY) * 2))) {
                         Log.d("MotionEvent", "Swiping left");
                         mHoverCell = getAndAddHoverView(this);
                         isSwiping = true;
@@ -117,8 +122,7 @@ public class SwipeList extends ListView {
                     return true;
                 }
 
-                lastX = (int) motionEvent.getX();
-                lastY = (int) motionEvent.getY();
+
                 Log.d("MotionEvent", "Move");
                 break;
             case MotionEvent.ACTION_UP:
@@ -178,10 +182,10 @@ public class SwipeList extends ListView {
 
     private void swipeEnded() {
         Log.d("Bounds", "Current Right " + mHoverCellCurrentBounds.right + " Current left " + mHoverCellCurrentBounds.left + " width " + mWidth  );
-        if(mHoverCellCurrentBounds.left > (mWidth / 2)) {
+        if(mHoverCellCurrentBounds.left > (mWidth / 2) || deltaX > 80) {
             mHoverCellCurrentBounds.offsetTo(mWidth, mHoverCellOriginalBounds.top);
             mScheduleActivity.shiftDay(-1);
-        } else if (mHoverCellCurrentBounds.right < (mWidth / 2)) {
+        } else if (mHoverCellCurrentBounds.right < (mWidth / 2) || deltaX < -80) {
             mHoverCellCurrentBounds.offsetTo(-mWidth, mHoverCellCurrentBounds.top);
             mScheduleActivity.shiftDay(1);
         } else
